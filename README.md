@@ -2,6 +2,10 @@
 
 # 🏦 Bank Service & Transaction Analysis
 
+## Project Presentation
+https://bank-ai-show.lovable.app/
+
+
 ## 📌 Project Overview
 
 This project delivers a comprehensive, data-driven analysis of banking operations, focusing on **customer demographics**, **transaction behavior**, and **service status optimization**.
