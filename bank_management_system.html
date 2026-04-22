@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bank Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a1628;
+  --navy-2: #0f2044;
+  --navy-3: #162a52;
+  --blue: #1a6ef5;
+  --blue-light: #4a8ff7;
+  --blue-dim: rgba(26,110,245,0.12);
+  --teal: #00c4a7;
+  --teal-dim: rgba(0,196,167,0.12);
+  --amber: #f5a623;
+  --amber-dim: rgba(245,166,35,0.12);
+  --red: #f04843;
+  --red-dim: rgba(240,72,67,0.12);
+  --green: #22c55e;
+  --green-dim: rgba(34,197,94,0.12);
+  --purple: #8b5cf6;
+  --purple-dim: rgba(139,92,246,0.12);
+  --text-1: #e8eaf0;
+  --text-2: #9aa3b5;
+  --text-3: #5c6880;
+  --border: rgba(255,255,255,0.07);
+  --border-2: rgba(255,255,255,0.12);
+  --card: rgba(15,32,68,0.7);
+  --card-2: rgba(22,42,82,0.5);
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --glow-blue: 0 0 20px rgba(26,110,245,0.2);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font);
+  background: var(--navy);
+  color: var(--text-1);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(rgba(26,110,245,0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(26,110,245,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Top accent glow */
+body::after {
+  content: '';
+  position: fixed;
+  top: -200px; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 400px;
+  background: radial-gradient(ellipse, rgba(26,110,245,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app { position: relative; z-index: 1; }
+
+/* ─── Header ─── */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,22,40,0.8);
+  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 100;
+}
+
+.logo {
+  display: flex; align-items: center; gap: 12px;
+}
+.logo-icon {
+  width: 36px; height: 36px;
+  background: var(--blue);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.logo-text { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+.logo-sub { font-size: 11px; color: var(--text-3); font-weight: 400; letter-spacing: 0.5px; }
+
+.header-right { display: flex; align-items: center; gap: 12px; }
+
+.status-badge {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px;
+  background: var(--green-dim);
+  border: 1px solid rgba(34,197,94,0.2);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--green);
+}
+.status-dot {
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.datetime {
+  font-size: 12px;
+  color: var(--text-3);
+  font-family: var(--mono);
+}
+
+/* ─── Nav ─── */
+nav {
+  display: flex;
+  gap: 2px;
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,22,40,0.5);
+  overflow-x: auto;
+}
+nav button {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-3);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 400;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+nav button:hover { background: var(--card-2); color: var(--text-2); }
+nav button.active { background: var(--blue-dim); color: var(--blue-light); }
+nav button .nav-icon { font-size: 14px; }
+
+/* ─── Main ─── */
+main { padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
+
+/* ─── KPI Strip ─── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+  cursor: default;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.kpi-card.blue::before { background: var(--blue); }
+.kpi-card.teal::before { background: var(--teal); }
+.kpi-card.amber::before { background: var(--amber); }
+.kpi-card.green::before { background: var(--green); }
+.kpi-card.red::before { background: var(--red); }
+.kpi-card.purple::before { background: var(--purple); }
+.kpi-card:hover { border-color: var(--border-2); transform: translateY(-1px); }
+.kpi-label { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+.kpi-value { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; line-height: 1; }
+.kpi-value.blue { color: #4a8ff7; }
+.kpi-value.teal { color: var(--teal); }
+.kpi-value.amber { color: var(--amber); }
+.kpi-value.green { color: var(--green); }
+.kpi-value.red { color: var(--red); }
+.kpi-value.purple { color: var(--purple); }
+.kpi-sub { font-size: 11px; color: var(--text-3); margin-top: 6px; }
+.kpi-change { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; }
+.kpi-change.up { color: var(--green); }
+.kpi-change.down { color: var(--red); }
+
+/* ─── Section Grid ─── */
+.section-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.section-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* ─── Cards ─── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.card-title { font-size: 14px; font-weight: 500; }
+.card-badge {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+.card-badge.blue { background: var(--blue-dim); color: var(--blue-light); }
+.card-badge.teal { background: var(--teal-dim); color: var(--teal); }
+.card-badge.amber { background: var(--amber-dim); color: var(--amber); }
+.card-badge.red { background: var(--red-dim); color: var(--red); }
+.card-badge.green { background: var(--green-dim); color: var(--green); }
+.card-body { padding: 20px; }
+
+/* ─── Charts ─── */
+.chart-wrap {
+  position: relative;
+  width: 100%;
+  height: 220px;
+}
+
+/* ─── Bar Chart ─── */
+.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 160px; padding: 0 4px; }
+.bar-group { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; }
+.bar {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: opacity 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+.bar:hover { opacity: 0.8; }
+.bar-label { font-size: 10px; color: var(--text-3); font-family: var(--mono); }
+
+/* ─── Donut ─── */
+.donut-wrap { display: flex; align-items: center; gap: 24px; padding: 16px 20px; }
+.donut-legend { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.legend-name { color: var(--text-2); flex: 1; }
+.legend-val { font-weight: 500; font-family: var(--mono); font-size: 11px; }
+.legend-pct { color: var(--text-3); font-size: 11px; }
+
+/* ─── Table ─── */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  padding: 10px 16px;
+  font-size: 11px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+}
+.data-table td {
+  padding: 11px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  color: var(--text-2);
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: rgba(26,110,245,0.04); color: var(--text-1); }
+.td-name { font-weight: 500; color: var(--text-1); }
+.td-mono { font-family: var(--mono); font-size: 12px; }
+
+/* ─── Pill / Tag ─── */
+.pill {
+  display: inline-flex; align-items: center;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.pill.active { background: var(--green-dim); color: var(--green); }
+.pill.inactive { background: var(--amber-dim); color: var(--amber); }
+.pill.closed { background: var(--red-dim); color: var(--red); }
+.pill.savings { background: var(--blue-dim); color: var(--blue-light); }
+.pill.current { background: var(--purple-dim); color: var(--purple); }
+.pill.completed { background: var(--green-dim); color: var(--green); }
+.pill.pending { background: var(--amber-dim); color: var(--amber); }
+.pill.progress { background: var(--blue-dim); color: var(--blue-light); }
+.pill.rejected { background: var(--red-dim); color: var(--red); }
+
+/* ─── Activity Feed ─── */
+.activity-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.activity-body { flex: 1; }
+.activity-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+.activity-meta { font-size: 11px; color: var(--text-3); }
+.activity-amount { font-size: 13px; font-weight: 600; font-family: var(--mono); }
+.activity-amount.credit { color: var(--teal); }
+.activity-amount.debit { color: var(--red); }
+
+/* ─── Progress Bar ─── */
+.progress-bar-wrap { display: flex; flex-direction: column; gap: 14px; }
+.progress-row { display: flex; flex-direction: column; gap: 6px; }
+.progress-label { display: flex; justify-content: space-between; font-size: 12px; }
+.progress-label-name { color: var(--text-2); }
+.progress-label-val { color: var(--text-1); font-weight: 500; font-family: var(--mono); }
+.progress-track {
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+
+/* ─── Inline Stat ─── */
+.inline-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+}
+.inline-stat {
+  background: var(--card);
+  padding: 16px 18px;
+}
+.inline-stat-label { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+.inline-stat-val { font-size: 20px; font-weight: 600; }
+
+/* ─── ER Diagram Tab ─── */
+#er-tab { display: none; }
+#er-tab svg { width: 100%; height: auto; }
+
+/* ─── Pages ─── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+
+/* ─── Search ─── */
+.search-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 220px;
+}
+.search-bar input {
+  background: none; border: none;
+  color: var(--text-1); font-family: var(--font); font-size: 13px;
+  outline: none; flex: 1;
+}
+.search-bar input::placeholder { color: var(--text-3); }
+
+/* ─── Suspicion Indicator ─── */
+.flag-row { background: rgba(240,72,67,0.05) !important; }
+.flag-icon { color: var(--red); font-size: 13px; }
+
+/* ─── Timeline Bar ─── */
+.timeline-month {
+  display: flex; flex-direction: column; gap: 4px; align-items: center;
+  flex: 1;
+}
+.timeline-bar-wrap {
+  display: flex; flex-direction: column; gap: 2px; width: 100%;
+  align-items: center;
+}
+.t-bar {
+  width: 100%; border-radius: 3px 3px 0 0; min-height: 2px;
+  cursor: pointer; transition: opacity 0.2s;
+}
+.t-bar:hover { opacity: 0.7; }
+.t-label { font-size: 9px; color: var(--text-3); font-family: var(--mono); }
+
+/* ─── Animate in ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.kpi-card { animation: fadeUp 0.4s ease both; }
+.kpi-card:nth-child(1) { animation-delay: 0.05s; }
+.kpi-card:nth-child(2) { animation-delay: 0.1s; }
+.kpi-card:nth-child(3) { animation-delay: 0.15s; }
+.kpi-card:nth-child(4) { animation-delay: 0.2s; }
+.kpi-card:nth-child(5) { animation-delay: 0.25s; }
+.kpi-card:nth-child(6) { animation-delay: 0.3s; }
+.card { animation: fadeUp 0.5s ease both; animation-delay: 0.2s; }
+
+/* ─── Tooltip ─── */
+.tooltip {
+  position: absolute;
+  background: var(--navy-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text-1);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 50;
+  font-family: var(--mono);
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1100px) {
+  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+  .section-grid { grid-template-columns: 1fr; }
+  .section-grid-3 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 700px) {
+  header { padding: 14px 16px; }
+  main { padding: 16px; }
+  nav { padding: 10px 16px; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .section-grid-3 { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ─── Header ─── -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🏦</div>
+    <div>
+      <div class="logo-text">NexaBank</div>
+      <div class="logo-sub">Management System</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-badge"><div class="status-dot"></div>Live</div>
+    <div class="datetime" id="clock">--:--:--</div>
+  </div>
+</header>
+
+<!-- ─── Nav ─── -->
+<nav>
+  <button class="active" onclick="showPage('dashboard', this)"><span class="nav-icon">◈</span> Dashboard</button>
+  <button onclick="showPage('customers', this)"><span class="nav-icon">◉</span> Customers</button>
+  <button onclick="showPage('accounts', this)"><span class="nav-icon">▣</span> Accounts</button>
+  <button onclick="showPage('transactions', this)"><span class="nav-icon">⇅</span> Transactions</button>
+  <button onclick="showPage('branches', this)"><span class="nav-icon">⬡</span> Branches</button>
+  <button onclick="showPage('employees', this)"><span class="nav-icon">◎</span> Employees</button>
+  <button onclick="showPage('services', this)"><span class="nav-icon">✦</span> Services</button>
+  <button onclick="showPage('er', this)"><span class="nav-icon">⊞</span> ER Diagram</button>
+</nav>
+
+<!-- ─── Main ─── -->
+<main>
+
+<!-- ════════════════ DASHBOARD ════════════════ -->
+<div id="page-dashboard" class="page active">
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-label">Total Customers</div>
+      <div class="kpi-value blue">1,000</div>
+      <div class="kpi-sub"><span class="kpi-change up">↑ 12%</span> vs last month</div>
+    </div>
+    <div class="kpi-card teal">
+      <div class="kpi-label">Total Accounts</div>
+      <div class="kpi-value teal">5,000</div>
+      <div class="kpi-sub">5 per customer avg</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Total Transactions</div>
+      <div class="kpi-value amber">96,469</div>
+      <div class="kpi-sub"><span class="kpi-change up">↑ 8.3%</span> this period</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Avg Balance</div>
+      <div class="kpi-value green">$26.4K</div>
+      <div class="kpi-sub">Median $26.2K</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Suspicious Txns</div>
+      <div class="kpi-value red">23+</div>
+      <div class="kpi-sub">&gt;80% balance withdrawals</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Active Branches</div>
+      <div class="kpi-value purple">15</div>
+      <div class="kpi-sub">Chicago leads $525.3M</div>
+    </div>
+  </div>
+
+  <!-- Row 1: Monthly Trend + Transaction Types -->
+  <div class="section-grid">
+
+    <!-- Monthly Transaction Trend -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Monthly Transaction Volume</div>
+        <span class="card-badge blue">Last 12 months</span>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;gap:16px;margin-bottom:14px;">
+          <div>
+            <div style="font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;">Total Transactions</div>
+            <div style="font-size:20px;font-weight:600;color:var(--blue-light);">17,305</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;">Peak Month</div>
+            <div style="font-size:20px;font-weight:600;color:var(--teal);">Feb 2026</div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.6px;">Peak Credits</div>
+            <div style="font-size:20px;font-weight:600;color:var(--amber);">$6.4M</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:6px;height:140px;padding:0 4px;">
+          <!-- bars generated via JS -->
+          <div id="monthly-bars" style="display:flex;align-items:flex-end;gap:6px;width:100%;height:100%;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:var(--text-3);">
+          <span>Mar'25</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span>
+          <span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+          <span>Jan'26</span><span>Feb</span><span>Mar</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transaction Types Donut -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Transaction Types</div>
+        <span class="card-badge teal">96,469 total</span>
+      </div>
+      <div class="donut-wrap">
+        <svg viewBox="0 0 100 100" style="width:120px;height:120px;flex-shrink:0;">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#1a2a50" stroke-width="18"/>
+          <circle id="d1" cx="50" cy="50" r="40" fill="none" stroke="#1a6ef5" stroke-width="18"
+            stroke-dasharray="105.6 145.8" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+          <circle id="d2" cx="50" cy="50" r="40" fill="none" stroke="#00c4a7" stroke-width="18"
+            stroke-dasharray="64.7 186.7" stroke-dashoffset="-105.6" transform="rotate(-90 50 50)"/>
+          <circle id="d3" cx="50" cy="50" r="40" fill="none" stroke="#f5a623" stroke-width="18"
+            stroke-dasharray="48.4 203" stroke-dashoffset="-170.3" transform="rotate(-90 50 50)"/>
+          <circle id="d4" cx="50" cy="50" r="40" fill="none" stroke="#8b5cf6" stroke-width="18"
+            stroke-dasharray="33.3 218.1" stroke-dashoffset="-218.7" transform="rotate(-90 50 50)"/>
+          <text x="50" y="46" text-anchor="middle" font-size="9" fill="#9aa3b5" font-family="DM Sans,sans-serif">Types</text>
+          <text x="50" y="57" text-anchor="middle" font-size="10" fill="#e8eaf0" font-weight="600" font-family="DM Sans,sans-serif">4</text>
+        </svg>
+        <div class="donut-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#1a6ef5;"></div>
+            <span class="legend-name">Balance Inquiry</span>
+            <span class="legend-val" style="color:#4a8ff7;">41,219</span>
+            <span class="legend-pct">42.4%</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#00c4a7;"></div>
+            <span class="legend-name">Deposit</span>
+            <span class="legend-val" style="color:#00c4a7;">24,333</span>
+            <span class="legend-pct">25.2%</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#f5a623;"></div>
+            <span class="legend-name">Withdrawal</span>
+            <span class="legend-val" style="color:#f5a623;">18,218</span>
+            <span class="legend-pct">18.9%</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#8b5cf6;"></div>
+            <span class="legend-name">Transfer</span>
+            <span class="legend-val" style="color:#8b5cf6;">12,699</span>
+            <span class="legend-pct">13.2%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Branch Performance + Top Customers + Activity -->
+  <div class="section-grid-3">
+
+    <!-- Branch Performance -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Branch Performance</div>
+        <span class="card-badge amber">Last 30 days</span>
+      </div>
+      <div class="card-body">
+        <div class="progress-bar-wrap">
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Dallas Branch</span><span class="progress-label-val">$1.20M</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:100%;background:var(--blue);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Oakwood Branch</span><span class="progress-label-val">$1.19M</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:99%;background:var(--teal);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">San Antonio</span><span class="progress-label-val">$1.13M</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:94%;background:var(--purple);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">New York</span><span class="progress-label-val">$1.12M</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:93%;background:var(--amber);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Los Angeles</span><span class="progress-label-val">$1.06M</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:88%;background:var(--green);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Houston</span><span class="progress-label-val">$921K</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:77%;background:var(--red);"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Customers -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Top 5 Customers</div>
+        <span class="card-badge green">By Balance</span>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Name</th><th>Accounts</th><th>Balance</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--amber);font-weight:600;">1</td><td class="td-name">Michelle Torres</td><td>5</td><td class="td-mono" style="color:var(--green);">$220,185</td></tr>
+            <tr><td style="color:var(--text-3);">2</td><td class="td-name">John Sanchez</td><td>5</td><td class="td-mono" style="color:var(--green);">$195,222</td></tr>
+            <tr><td style="color:var(--text-3);">3</td><td class="td-name">Charles Robinson</td><td>5</td><td class="td-mono" style="color:var(--green);">$167,176</td></tr>
+            <tr><td style="color:var(--text-3);">4</td><td class="td-name">Lisa Thompson</td><td>5</td><td class="td-mono" style="color:var(--green);">$162,655</td></tr>
+            <tr><td style="color:var(--text-3);">5</td><td class="td-name">Margaret Gonzalez</td><td>5</td><td class="td-mono" style="color:var(--green);">$143,207</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Service Requests -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Service Request Status</div>
+        <span class="card-badge blue">All time</span>
+      </div>
+      <div class="card-body">
+        <div class="progress-bar-wrap">
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">In Progress</span><span class="progress-label-val" style="color:var(--blue-light);">42.2%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:42%;background:var(--blue);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Pending</span><span class="progress-label-val" style="color:var(--amber);">25.2%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:25%;background:var(--amber);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Completed</span><span class="progress-label-val" style="color:var(--green);">18.7%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:19%;background:var(--green);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Rejected</span><span class="progress-label-val" style="color:var(--red);">13.4%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:13%;background:var(--red);"></div></div>
+          </div>
+        </div>
+        <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);">
+          <div class="inline-stats" style="border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border);">
+            <div class="inline-stat">
+              <div class="inline-stat-label">Bill Payment</div>
+              <div class="inline-stat-val" style="color:var(--blue-light);">83.5%</div>
+            </div>
+            <div class="inline-stat">
+              <div class="inline-stat-label">Top service</div>
+              <div class="inline-stat-val" style="color:var(--text-1);font-size:14px;">Bill Pay</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: Recent suspicious + Employee top -->
+  <div class="section-grid">
+    <!-- Suspicious Transactions -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">⚠ Flagged Suspicious Transactions</div>
+        <span class="card-badge red">Auto-detected</span>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <table class="data-table">
+          <thead>
+            <tr><th>Txn ID</th><th>Customer</th><th>Branch</th><th>Amount</th><th>% of Balance</th><th>Flag</th></tr>
+          </thead>
+          <tbody>
+            <tr class="flag-row"><td class="td-mono">3465</td><td class="td-name">Mary Jones</td><td>Los Angeles</td><td class="td-mono" style="color:var(--red);">$21,409</td><td class="td-mono">87%</td><td><span class="flag-icon">⚑</span></td></tr>
+            <tr class="flag-row"><td class="td-mono">24336</td><td class="td-name">Mary Jones</td><td>Los Angeles</td><td class="td-mono" style="color:var(--red);">$4,412</td><td class="td-mono">91%</td><td><span class="flag-icon">⚑</span></td></tr>
+            <tr class="flag-row"><td class="td-mono">13841</td><td class="td-name">Mary Martin</td><td>San Diego</td><td class="td-mono" style="color:var(--red);">$4,936</td><td class="td-mono">85%</td><td><span class="flag-icon">⚑</span></td></tr>
+            <tr class="flag-row"><td class="td-mono">5444</td><td class="td-name">Richard Miller</td><td>Lakeside</td><td class="td-mono" style="color:var(--red);">$15,802</td><td class="td-mono">89%</td><td><span class="flag-icon">⚑</span></td></tr>
+            <tr class="flag-row"><td class="td-mono">23487</td><td class="td-name">Michelle Nguyen</td><td>Phoenix</td><td class="td-mono" style="color:var(--red);">$24,741</td><td class="td-mono">82%</td><td><span class="flag-icon">⚑</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Top Employee Activity -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Top Employee Activity</div>
+        <span class="card-badge purple">Last 30 days</span>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <table class="data-table">
+          <thead><tr><th>Employee</th><th>Role</th><th>Txns</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td class="td-name">Mary Hall</td><td><span class="pill progress">Cust. Svc</span></td><td class="td-mono">54</td><td class="td-mono" style="color:var(--teal);">$692K</td></tr>
+            <tr><td class="td-name">Richard Green</td><td><span class="pill progress">Cust. Svc</span></td><td class="td-mono">53</td><td class="td-mono" style="color:var(--teal);">$698K</td></tr>
+            <tr><td class="td-name">Richard Lopez</td><td><span class="pill progress">Cust. Svc</span></td><td class="td-mono">50</td><td class="td-mono" style="color:var(--teal);">$642K</td></tr>
+            <tr><td class="td-name">Michelle Thomas</td><td><span class="pill progress">Cust. Svc</span></td><td class="td-mono">49</td><td class="td-mono" style="color:var(--teal);">$576K</td></tr>
+            <tr><td class="td-name">Richard Gonzalez</td><td><span class="pill progress">Cust. Svc</span></td><td class="td-mono">49</td><td class="td-mono" style="color:var(--teal);">$572K</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /dashboard -->
+
+<!-- ════════════════ CUSTOMERS ════════════════ -->
+<div id="page-customers" class="page">
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-header">
+      <div class="card-title">Customer Master View</div>
+      <span class="card-badge blue">1,000 customers</span>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <table class="data-table">
+        <thead><tr><th>ID</th><th>Name</th><th>National ID</th><th>Phone</th><th>Email</th><th>Accounts</th><th>Total Balance</th></tr></thead>
+        <tbody>
+          <tr><td class="td-mono">1</td><td class="td-name">Sarah Moore</td><td class="td-mono">34423374774470</td><td>194-246-6492</td><td style="font-size:12px;">user1@example.com</td><td>5</td><td class="td-mono" style="color:var(--green);">$62,965</td></tr>
+          <tr><td class="td-mono">2</td><td class="td-name">Michelle Torres</td><td class="td-mono">62195834999291</td><td>172-917-1388</td><td style="font-size:12px;">user2@example.com</td><td>5</td><td class="td-mono" style="color:var(--green);">$220,185</td></tr>
+          <tr><td class="td-mono">3</td><td class="td-name">Charles Robinson</td><td class="td-mono">85501836036341</td><td>197-052-3140</td><td style="font-size:12px;">user3@example.com</td><td>5</td><td class="td-mono" style="color:var(--green);">$167,176</td></tr>
+          <tr><td class="td-mono">4</td><td class="td-name">Andrew Perez</td><td class="td-mono">67459345620659</td><td>133-121-5465</td><td style="font-size:12px;">user4@example.com</td><td>5</td><td class="td-mono" style="color:var(--green);">$83,303</td></tr>
+          <tr><td class="td-mono">5</td><td class="td-name">Brian King</td><td class="td-mono">11916316590317</td><td>158-762-3426</td><td style="font-size:12px;">user5@example.com</td><td>5</td><td class="td-mono" style="color:var(--green);">$133,324</td></tr>
+          <tr><td class="td-mono">6</td><td class="td-name">Sandra Harris</td><td class="td-mono">18597333290216</td><td>117-802-8679</td><td style="font-size:12px;">user6@example.com</td><td>5</td><td class="td-mono" style="color:var(--green);">$105,760</td></tr>
+          <tr><td class="td-mono">7</td><td class="td-name">Betty Sanchez</td><td class="td-mono">89156039241498</td><td>139-124-1424</td><td style="font-size:12px;">user7@example.com</td><td>5</td><td class="td-mono" style="color:var(--green);">$119,627</td></tr>
+          <tr><td class="td-mono">8</td><td class="td-name">Joshua Williams</td><td class="td-mono">52743609976181</td><td>132-341-0717</td><td style="font-size:12px;">user8@example.com</td><td>5</td><td class="td-mono" style="color:var(--green);">$84,418</td></tr>
+          <tr><td class="td-mono">9</td><td class="td-name">Anthony Clark</td><td class="td-mono">77894467998936</td><td>118-787-8366</td><td style="font-size:12px;">user9@example.com</td><td>5</td><td class="td-mono" style="color:var(--green);">$130,397</td></tr>
+          <tr><td class="td-mono">10</td><td class="td-name">Jessica King</td><td class="td-mono">51032976778420</td><td>151-752-9168</td><td style="font-size:12px;">user10@example.com</td><td>5</td><td class="td-mono" style="color:var(--green);">$142,675</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Age Group Chart -->
+  <div class="section-grid-3">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Age Group Distribution</div></div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Senior (60+)</span><span class="progress-label-val" style="color:var(--blue-light);">50,900</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:100%;background:var(--blue);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Middle Aged (35–59)</span><span class="progress-label-val" style="color:var(--teal);">29,049</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:57%;background:var(--teal);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Young Adult (18–34)</span><span class="progress-label-val" style="color:var(--amber);">16,520</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:32%;background:var(--amber);"></div></div>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding:12px;background:var(--amber-dim);border-radius:var(--radius-sm);border:1px solid rgba(245,166,35,0.15);">
+          <div style="font-size:12px;color:var(--amber);">💡 Opportunity: Young Adults (17%) are underrepresented. Target with mobile-first products.</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Top Customers by Activity</div><span class="card-badge green">Last 90 days</span></div>
+      <div class="card-body" style="padding:0;">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Txns</th></tr></thead>
+          <tbody>
+            <tr><td class="td-name">Daniel Jackson</td><td class="td-mono" style="color:var(--amber);">18</td></tr>
+            <tr><td class="td-name">William Jackson</td><td class="td-mono">17</td></tr>
+            <tr><td class="td-name">Joshua King</td><td class="td-mono">17</td></tr>
+            <tr><td class="td-name">David Rodriguez</td><td class="td-mono">16</td></tr>
+            <tr><td class="td-name">Patricia Williams</td><td class="td-mono">16</td></tr>
+            <tr><td class="td-name">Elizabeth Perez</td><td class="td-mono">16</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Multi-Service Customers</div><span class="card-badge teal">2+ completed</span></div>
+      <div class="card-body" style="padding:0;">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Services</th></tr></thead>
+          <tbody>
+            <tr><td class="td-name">Robert Clark</td><td><span class="pill completed">4</span></td></tr>
+            <tr><td class="td-name">Sandra Nguyen</td><td><span class="pill completed">4</span></td></tr>
+            <tr><td class="td-name">Margaret Gonzalez</td><td><span class="pill completed">3</span></td></tr>
+            <tr><td class="td-name">Lisa Thompson</td><td><span class="pill completed">3</span></td></tr>
+            <tr><td class="td-name">Kenneth Nguyen</td><td><span class="pill completed">3</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ ACCOUNTS ════════════════ -->
+<div id="page-accounts" class="page">
+  <div class="section-grid-3" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Account Type Split</div></div>
+      <div class="donut-wrap" style="padding:20px;">
+        <svg viewBox="0 0 100 100" style="width:100px;height:100px;flex-shrink:0;">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#1a2a50" stroke-width="16"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#1a6ef5" stroke-width="16"
+            stroke-dasharray="119.8 119.2" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#8b5cf6" stroke-width="16"
+            stroke-dasharray="117.8 121.2" stroke-dashoffset="-119.8" transform="rotate(-90 50 50)"/>
+        </svg>
+        <div class="donut-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#1a6ef5;"></div>
+            <span class="legend-name">Savings</span>
+            <span class="legend-val" style="color:#4a8ff7;">50.6%</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#8b5cf6;"></div>
+            <span class="legend-name">Current</span>
+            <span class="legend-val" style="color:#8b5cf6;">49.4%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Account Status</div></div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Active</span><span class="progress-label-val" style="color:var(--green);">~62%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:62%;background:var(--green);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Inactive</span><span class="progress-label-val" style="color:var(--amber);">~35%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:35%;background:var(--amber);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Closed</span><span class="progress-label-val" style="color:var(--red);">~3%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:3%;background:var(--red);"></div></div>
+          </div>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:var(--text-3);">Accounts opened before 2024-01-01 → Inactive</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Dormant Accounts</div><span class="card-badge red">60+ days</span></div>
+      <div class="card-body">
+        <div style="font-size:32px;font-weight:600;color:var(--red);margin-bottom:8px;">23</div>
+        <div style="font-size:13px;color:var(--text-2);margin-bottom:12px;">Accounts with no transactions in the last 60 days</div>
+        <div style="font-size:12px;color:var(--text-3);">Dormancy range: <span style="color:var(--amber);">66 – 414 days</span></div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:4px;">Longest dormant: <span style="color:var(--red);">Account #6993 (414 days)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">Account Portfolio — Inactive/Closed Accounts</div><span class="card-badge amber">Ordered by open date</span></div>
+    <div class="card-body" style="padding:0;">
+      <table class="data-table">
+        <thead><tr><th>Acct ID</th><th>Customer</th><th>Branch</th><th>Type</th><th>Open Date</th><th>Status</th><th>Balance</th></tr></thead>
+        <tbody>
+          <tr><td class="td-mono">4117</td><td class="td-name">David Lopez</td><td>Sunset Boulevard</td><td><span class="pill savings">Savings</span></td><td class="td-mono">2023-12-31</td><td><span class="pill inactive">Inactive</span></td><td class="td-mono">$14,902</td></tr>
+          <tr><td class="td-mono">8219</td><td class="td-name">Joseph King</td><td>Philadelphia</td><td><span class="pill savings">Savings</span></td><td class="td-mono">2023-12-31</td><td><span class="pill inactive">Inactive</span></td><td class="td-mono">$33,210</td></tr>
+          <tr><td class="td-mono">12515</td><td class="td-name">Betty Davis</td><td>Dallas</td><td><span class="pill savings">Savings</span></td><td class="td-mono">2023-12-31</td><td><span class="pill inactive">Inactive</span></td><td class="td-mono">$22,848</td></tr>
+          <tr><td class="td-mono">13193</td><td class="td-name">Elizabeth Jones</td><td>San Jose</td><td><span class="pill savings">Savings</span></td><td class="td-mono">2023-12-31</td><td><span class="pill inactive">Inactive</span></td><td class="td-mono">$13,626</td></tr>
+          <tr><td class="td-mono">19559</td><td class="td-name">Robert Torres</td><td>Dallas</td><td><span class="pill current">Current</span></td><td class="td-mono">2023-12-31</td><td><span class="pill inactive">Inactive</span></td><td class="td-mono">$35,479</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ TRANSACTIONS ════════════════ -->
+<div id="page-transactions" class="page">
+  <div class="section-grid-3" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Payment Method</div></div>
+      <div class="card-body">
+        <div class="progress-bar-wrap">
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Cash</span><span class="progress-label-val" style="color:var(--amber);">55.8%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:56%;background:var(--amber);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Credit Card</span><span class="progress-label-val" style="color:var(--blue-light);">24.6%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:25%;background:var(--blue);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Debit Card</span><span class="progress-label-val" style="color:var(--teal);">13.9%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:14%;background:var(--teal);"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span class="progress-label-name">Check</span><span class="progress-label-val" style="color:var(--purple);">4.8%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:5%;background:var(--purple);"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="grid-column:span 2;">
+      <div class="card-header"><div class="card-title">Monthly Summary (Last 12 Months)</div></div>
+      <div class="card-body" style="padding:0;">
+        <table class="data-table">
+          <thead><tr><th>Month</th><th>Credits</th><th>Debits</th><th>Net Flow</th><th>Transactions</th></tr></thead>
+          <tbody>
+            <tr><td class="td-mono">2026-03</td><td class="td-mono" style="color:var(--green);">$5,940,139</td><td class="td-mono" style="color:var(--red);">$4,298,653</td><td class="td-mono" style="color:var(--teal);">+$1,641,486</td><td class="td-mono">1,827</td></tr>
+            <tr><td class="td-mono">2026-02</td><td class="td-mono" style="color:var(--green);">$6,411,912</td><td class="td-mono" style="color:var(--red);">$5,563,894</td><td class="td-mono" style="color:var(--teal);">+$848,018</td><td class="td-mono">2,211</td></tr>
+            <tr><td class="td-mono">2026-01</td><td class="td-mono" style="color:var(--green);">$6,611,003</td><td class="td-mono" style="color:var(--red);">$4,760,758</td><td class="td-mono" style="color:var(--teal);">+$1,850,245</td><td class="td-mono">2,068</td></tr>
+            <tr><td class="td-mono">2025-12</td><td class="td-mono" style="color:var(--green);">$5,170,958</td><td class="td-mono" style="color:var(--red);">$4,108,716</td><td class="td-mono" style="color:var(--teal);">+$1,062,242</td><td class="td-mono">1,701</td></tr>
+            <tr><td class="td-mono">2025-11</td><td class="td-mono" style="color:var(--green);">$4,471,817</td><td class="td-mono" style="color:var(--red);">$3,352,428</td><td class="td-mono" style="color:var(--teal);">+$1,119,389</td><td class="td-mono">1,452</td></tr>
+            <tr><td class="td-mono">2025-10</td><td class="td-mono" style="color:var(--green);">$3,893,520</td><td class="td-mono" style="color:var(--red);">$2,839,765</td><td class="td-mono" style="color:var(--teal);">+$1,053,755</td><td class="td-mono">1,292</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Recent Customer Statements</div><span class="card-badge blue">Live feed</span></div>
+    <div class="card-body" style="padding:0;">
+      <table class="data-table">
+        <thead><tr><th>Customer</th><th>Account</th><th>Date</th><th>Type</th><th>Amount</th></tr></thead>
+        <tbody>
+          <tr><td class="td-name">Patricia Anderson</td><td class="td-mono">26439</td><td class="td-mono">2026-01-01</td><td><span class="pill inactive">Withdrawal</span></td><td class="td-mono" style="color:var(--red);">$305</td></tr>
+          <tr><td class="td-name">Brian Miller</td><td class="td-mono">14881</td><td class="td-mono">2024-05-19</td><td><span class="pill pending">Bal. Inquiry</span></td><td class="td-mono">—</td></tr>
+          <tr><td class="td-name">Donna Jackson</td><td class="td-mono">28728</td><td class="td-mono">2023-12-16</td><td><span class="pill inactive">Withdrawal</span></td><td class="td-mono" style="color:var(--red);">$23,217</td></tr>
+          <tr><td class="td-name">Andrew Jones</td><td class="td-mono">21856</td><td class="td-mono">2025-09-23</td><td><span class="pill completed">Deposit</span></td><td class="td-mono" style="color:var(--green);">$19,451</td></tr>
+          <tr><td class="td-name">Patricia Wilson</td><td class="td-mono">29261</td><td class="td-mono">2026-05-02</td><td><span class="pill progress">Transfer</span></td><td class="td-mono" style="color:var(--blue-light);">$12,426</td></tr>
+          <tr><td class="td-name">Carol King</td><td class="td-mono">11735</td><td class="td-mono">2026-01-22</td><td><span class="pill completed">Deposit</span></td><td class="td-mono" style="color:var(--green);">$20,750</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ BRANCHES ════════════════ -->
+<div id="page-branches" class="page">
+  <div class="card">
+    <div class="card-header"><div class="card-title">Branch Performance — Last 30 Days</div><span class="card-badge amber">15 branches</span></div>
+    <div class="card-body" style="padding:0;">
+      <table class="data-table">
+        <thead><tr><th>Branch</th><th>Customers</th><th>Transactions</th><th>Total Value</th><th>Rank</th></tr></thead>
+        <tbody>
+          <tr><td class="td-name">Dallas Branch</td><td>88</td><td class="td-mono">149</td><td class="td-mono" style="color:var(--green);">$1,200,080</td><td style="color:var(--amber);font-weight:600;">🥇 1st</td></tr>
+          <tr><td class="td-name">Oakwood Branch</td><td>88</td><td class="td-mono">149</td><td class="td-mono" style="color:var(--green);">$1,193,668</td><td style="color:var(--text-3);">2nd</td></tr>
+          <tr><td class="td-name">San Antonio Branch</td><td>94</td><td class="td-mono">151</td><td class="td-mono" style="color:var(--green);">$1,126,485</td><td style="color:var(--text-3);">3rd</td></tr>
+          <tr><td class="td-name">New York Branch</td><td>76</td><td class="td-mono">133</td><td class="td-mono" style="color:var(--green);">$1,123,906</td><td style="color:var(--text-3);">4th</td></tr>
+          <tr><td class="td-name">Los Angeles Branch</td><td>90</td><td class="td-mono">141</td><td class="td-mono" style="color:var(--green);">$1,060,494</td><td style="color:var(--text-3);">5th</td></tr>
+          <tr><td class="td-name">Sunset Boulevard</td><td>81</td><td class="td-mono">152</td><td class="td-mono" style="color:var(--teal);">$898,210</td><td style="color:var(--text-3);">6th</td></tr>
+          <tr><td class="td-name">Chicago Branch</td><td>88</td><td class="td-mono">128</td><td class="td-mono" style="color:var(--teal);">$894,044</td><td style="color:var(--text-3);">7th</td></tr>
+          <tr><td class="td-name">Houston Branch</td><td>74</td><td class="td-mono">122</td><td class="td-mono" style="color:var(--teal);">$921,350</td><td style="color:var(--text-3);">8th</td></tr>
+          <tr><td class="td-name">Lakeside Branch</td><td>84</td><td class="td-mono">133</td><td class="td-mono" style="color:var(--teal);">$920,775</td><td style="color:var(--text-3);">9th</td></tr>
+          <tr><td class="td-name">San Jose Branch</td><td>79</td><td class="td-mono">131</td><td class="td-mono" style="color:var(--text-2);">$909,730</td><td style="color:var(--text-3);">10th</td></tr>
+          <tr><td class="td-name">Philadelphia Branch</td><td>77</td><td class="td-mono">125</td><td class="td-mono" style="color:var(--text-2);">$835,292</td><td style="color:var(--text-3);">11th</td></tr>
+          <tr><td class="td-name">Phoenix Branch</td><td>64</td><td class="td-mono">126</td><td class="td-mono" style="color:var(--text-2);">$837,139</td><td style="color:var(--text-3);">12th</td></tr>
+          <tr><td class="td-name">Maple Street Branch</td><td>81</td><td class="td-mono">131</td><td class="td-mono" style="color:var(--text-2);">$828,410</td><td style="color:var(--text-3);">13th</td></tr>
+          <tr><td class="td-name">Riverside Branch</td><td>76</td><td class="td-mono">123</td><td class="td-mono" style="color:var(--text-2);">$880,598</td><td style="color:var(--text-3);">14th</td></tr>
+          <tr><td class="td-name">San Diego Branch</td><td>62</td><td class="td-mono">109</td><td class="td-mono" style="color:var(--text-2);">$779,208</td><td style="color:var(--text-3);">15th</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ EMPLOYEES ════════════════ -->
+<div id="page-employees" class="page">
+  <div class="card">
+    <div class="card-header"><div class="card-title">Employee Activity Report</div><span class="card-badge purple">Top 10 performers</span></div>
+    <div class="card-body" style="padding:0;">
+      <table class="data-table">
+        <thead><tr><th>Rank</th><th>Employee</th><th>Role</th><th>Branch</th><th>Txns Handled</th><th>Total Value</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--amber);font-weight:600;">1</td><td class="td-name">Mary Hall</td><td><span class="pill progress">Cust. Service</span></td><td>New York</td><td class="td-mono">54</td><td class="td-mono" style="color:var(--green);">$692,714</td></tr>
+          <tr><td>2</td><td class="td-name">Richard Green</td><td><span class="pill progress">Cust. Service</span></td><td>Oakwood</td><td class="td-mono">53</td><td class="td-mono" style="color:var(--green);">$697,921</td></tr>
+          <tr><td>3</td><td class="td-name">Richard Lopez</td><td><span class="pill progress">Cust. Service</span></td><td>Los Angeles</td><td class="td-mono">50</td><td class="td-mono" style="color:var(--green);">$642,105</td></tr>
+          <tr><td>4</td><td class="td-name">Michelle Thomas</td><td><span class="pill progress">Cust. Service</span></td><td>Sunset Blvd</td><td class="td-mono">49</td><td class="td-mono" style="color:var(--green);">$576,037</td></tr>
+          <tr><td>5</td><td class="td-name">Richard Gonzalez</td><td><span class="pill progress">Cust. Service</span></td><td>Chicago</td><td class="td-mono">49</td><td class="td-mono" style="color:var(--green);">$572,224</td></tr>
+          <tr><td>6</td><td class="td-name">Anthony Thomas</td><td><span class="pill progress">Cust. Service</span></td><td>San Antonio</td><td class="td-mono">48</td><td class="td-mono" style="color:var(--teal);">$629,822</td></tr>
+          <tr><td>7</td><td class="td-name">Joseph Jackson</td><td><span class="pill progress">Cust. Service</span></td><td>Dallas</td><td class="td-mono">48</td><td class="td-mono" style="color:var(--teal);">$624,802</td></tr>
+          <tr><td>8</td><td class="td-name">Betty Moore</td><td><span class="pill progress">Cust. Service</span></td><td>San Jose</td><td class="td-mono">47</td><td class="td-mono" style="color:var(--teal);">$617,018</td></tr>
+          <tr><td>9</td><td class="td-name">Patricia Wright</td><td><span class="pill progress">Cust. Service</span></td><td>San Diego</td><td class="td-mono">41</td><td class="td-mono" style="color:var(--text-2);">$505,060</td></tr>
+          <tr><td>10</td><td class="td-name">Steven Jackson</td><td><span class="pill progress">Cust. Service</span></td><td>Lakeside</td><td class="td-mono">41</td><td class="td-mono" style="color:var(--text-2);">$521,482</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div style="margin-top:16px;padding:14px 18px;background:var(--blue-dim);border-radius:var(--radius-sm);border:1px solid rgba(26,110,245,0.15);font-size:13px;color:var(--text-2);">
+    ℹ All top 10 performers are <strong style="color:var(--blue-light);">Customer Service</strong> staff — reflecting the high front-line transaction volume. Employee roles: Teller · Manager · Customer Service.
+  </div>
+</div>
+
+<!-- ════════════════ SERVICES ════════════════ -->
+<div id="page-services" class="page">
+  <div class="section-grid-3" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Service Catalog</div></div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="padding:14px;background:var(--blue-dim);border-radius:var(--radius-sm);border:1px solid rgba(26,110,245,0.15);">
+            <div style="font-size:13px;font-weight:600;color:var(--blue-light);margin-bottom:4px;">💳 Bill Payment</div>
+            <div style="font-size:12px;color:var(--text-3);">83.5% of all requests · High-frequency daily service</div>
+          </div>
+          <div style="padding:14px;background:var(--teal-dim);border-radius:var(--radius-sm);border:1px solid rgba(0,196,167,0.15);">
+            <div style="font-size:13px;font-weight:600;color:var(--teal);margin-bottom:4px;">🏦 Loan</div>
+            <div style="font-size:12px;color:var(--text-3);">11.0% of requests · Complex approval workflows</div>
+          </div>
+          <div style="padding:14px;background:var(--purple-dim);border-radius:var(--radius-sm);border:1px solid rgba(139,92,246,0.15);">
+            <div style="font-size:13px;font-weight:600;color:var(--purple);margin-bottom:4px;">🛡 Insurance</div>
+            <div style="font-size:12px;color:var(--text-3);">9.5% of requests · Periodic decisions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="grid-column:span 2;">
+      <div class="card-header"><div class="card-title">Service × Status Breakdown</div></div>
+      <div class="card-body" style="padding:0;">
+        <table class="data-table">
+          <thead><tr><th>Service</th><th>Completed</th><th>In Progress</th><th>Pending</th><th>Rejected</th><th>Total</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="td-name">Bill Payment</td>
+              <td class="td-mono" style="color:var(--green);">15,243</td>
+              <td class="td-mono" style="color:var(--blue-light);">33,691</td>
+              <td class="td-mono" style="color:var(--amber);">20,503</td>
+              <td class="td-mono" style="color:var(--red);">10,832</td>
+              <td class="td-mono" style="font-weight:600;">80,269</td>
+            </tr>
+            <tr>
+              <td class="td-name">Loan</td>
+              <td class="td-mono" style="color:var(--green);">1,389</td>
+              <td class="td-mono" style="color:var(--blue-light);">4,091</td>
+              <td class="td-mono" style="color:var(--amber);">2,085</td>
+              <td class="td-mono" style="color:var(--red);">1,146</td>
+              <td class="td-mono" style="font-weight:600;">8,711</td>
+            </tr>
+            <tr>
+              <td class="td-name">Insurance</td>
+              <td class="td-mono" style="color:var(--green);">1,494</td>
+              <td class="td-mono" style="color:var(--blue-light);">3,188</td>
+              <td class="td-mono" style="color:var(--amber);">1,876</td>
+              <td class="td-mono" style="color:var(--red);">931</td>
+              <td class="td-mono" style="font-weight:600;">7,489</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding:14px 16px;background:var(--amber-dim);border-top:1px solid rgba(245,166,35,0.12);font-size:12px;color:var(--amber);">
+          ⚠ 13.3% rejection rate — investigate Bill Payment & Loan processing bottlenecks.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ ER DIAGRAM ════════════════ -->
+<div id="page-er" class="page">
+  <div class="card">
+    <div class="card-header"><div class="card-title">Entity Relationship Diagram — Bank Management System</div><span class="card-badge blue">7 entities</span></div>
+    <div class="card-body">
+      <svg viewBox="0 0 860 580" style="width:100%;height:auto;">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="#5c6880" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+
+        <!-- Branches -->
+        <rect x="20" y="60" width="160" height="130" rx="8" fill="rgba(26,110,245,0.08)" stroke="#1a6ef5" stroke-width="1.2"/>
+        <rect x="20" y="60" width="160" height="28" rx="8" fill="#1a6ef5" fill-opacity="0.25"/>
+        <rect x="20" y="80" width="160" height="8" rx="0" fill="#1a6ef5" fill-opacity="0.25"/>
+        <text x="100" y="79" text-anchor="middle" font-size="13" font-weight="600" fill="#4a8ff7" font-family="DM Sans,sans-serif">Branches</text>
+        <text x="30" y="106" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">PK  Branch_ID</text>
+        <text x="30" y="122" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Branch_Name</text>
+        <text x="30" y="138" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Location</text>
+        <text x="30" y="154" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Phone</text>
+        <text x="30" y="175" font-size="10" fill="#1a6ef5" font-family="DM Sans,sans-serif">1 ──── N Employees</text>
+
+        <!-- Employees -->
+        <rect x="20" y="240" width="160" height="160" rx="8" fill="rgba(0,196,167,0.08)" stroke="#00c4a7" stroke-width="1.2"/>
+        <text x="100" y="260" text-anchor="middle" font-size="13" font-weight="600" fill="#00c4a7" font-family="DM Sans,sans-serif">Employees</text>
+        <text x="30" y="282" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">PK  EMP_ID</text>
+        <text x="30" y="298" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Name</text>
+        <text x="30" y="314" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Role</text>
+        <text x="30" y="330" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Username</text>
+        <text x="30" y="346" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">FK  Branch_ID</text>
+        <text x="30" y="380" font-size="10" fill="#00c4a7" font-family="DM Sans,sans-serif">1 ──── N Transactions</text>
+
+        <!-- Customers -->
+        <rect x="220" y="60" width="170" height="160" rx="8" fill="rgba(245,166,35,0.08)" stroke="#f5a623" stroke-width="1.2"/>
+        <text x="305" y="80" text-anchor="middle" font-size="13" font-weight="600" fill="#f5a623" font-family="DM Sans,sans-serif">Customers</text>
+        <text x="230" y="102" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">PK  Customer_ID</text>
+        <text x="230" y="118" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Name</text>
+        <text x="230" y="134" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    DOB</text>
+        <text x="230" y="150" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Address</text>
+        <text x="230" y="166" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Phone</text>
+        <text x="230" y="182" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    National_ID ✦</text>
+        <text x="230" y="198" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Email ✦</text>
+
+        <!-- Accounts -->
+        <rect x="430" y="140" width="185" height="210" rx="8" fill="rgba(139,92,246,0.08)" stroke="#8b5cf6" stroke-width="1.2"/>
+        <text x="522" y="160" text-anchor="middle" font-size="13" font-weight="600" fill="#8b5cf6" font-family="DM Sans,sans-serif">Accounts</text>
+        <text x="440" y="182" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">PK  Account_ID</text>
+        <text x="440" y="198" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">FK  Customer_ID</text>
+        <text x="440" y="214" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">FK  Branch_ID</text>
+        <text x="440" y="230" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">FK  EMP_ID</text>
+        <text x="440" y="246" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Account_Type</text>
+        <text x="440" y="262" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Balance ≥ 0</text>
+        <text x="440" y="278" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Status</text>
+        <text x="440" y="294" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Open_Date</text>
+        <text x="440" y="330" font-size="10" fill="#8b5cf6" font-family="DM Sans,sans-serif">1 ──── N Transactions</text>
+
+        <!-- Transactions -->
+        <rect x="660" y="100" width="185" height="220" rx="8" fill="rgba(240,72,67,0.08)" stroke="#f04843" stroke-width="1.2"/>
+        <text x="752" y="120" text-anchor="middle" font-size="13" font-weight="600" fill="#f04843" font-family="DM Sans,sans-serif">Transactions</text>
+        <text x="670" y="142" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">PK  Transaction_ID</text>
+        <text x="670" y="158" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">FK  Account_ID</text>
+        <text x="670" y="174" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">FK  EMP_ID (opt)</text>
+        <text x="670" y="190" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Type</text>
+        <text x="670" y="206" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Media</text>
+        <text x="670" y="222" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Amount</text>
+        <text x="670" y="238" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Date</text>
+        <text x="670" y="254" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Status</text>
+        <text x="670" y="295" font-size="10" fill="#f04843" font-family="DM Sans,sans-serif">CHECK: BalInq→NULL amt</text>
+        <text x="670" y="310" font-size="10" fill="#f04843" font-family="DM Sans,sans-serif">Deposit/Withdraw &gt; 0</text>
+
+        <!-- Services -->
+        <rect x="430" y="400" width="160" height="110" rx="8" fill="rgba(34,197,94,0.08)" stroke="#22c55e" stroke-width="1.2"/>
+        <text x="510" y="420" text-anchor="middle" font-size="13" font-weight="600" fill="#22c55e" font-family="DM Sans,sans-serif">Services</text>
+        <text x="440" y="442" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">PK  Service_ID</text>
+        <text x="440" y="458" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Service_Name</text>
+        <text x="440" y="474" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Description</text>
+        <text x="440" y="492" font-size="10" fill="#22c55e" font-family="DM Sans,sans-serif">1 ──── N Service_Requests</text>
+
+        <!-- Service_Requests -->
+        <rect x="220" y="280" width="180" height="200" rx="8" fill="rgba(245,166,35,0.06)" stroke="#f5a623" stroke-width="1" stroke-dasharray="5 3"/>
+        <text x="310" y="300" text-anchor="middle" font-size="13" font-weight="600" fill="#f5a623" font-family="DM Sans,sans-serif">Service_Requests</text>
+        <text x="230" y="322" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">PK  Request_ID</text>
+        <text x="230" y="338" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">FK  Customer_ID</text>
+        <text x="230" y="354" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">FK  Service_ID</text>
+        <text x="230" y="370" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">FK  EMP_ID</text>
+        <text x="230" y="386" font-size="11" fill="#9aa3b5" font-family="DM Mono,monospace">FK  Branch_ID</text>
+        <text x="230" y="402" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Status</text>
+        <text x="230" y="418" font-size="11" fill="#5c6880" font-family="DM Mono,monospace">    Date · Amount</text>
+        <text x="230" y="452" font-size="10" fill="#f5a623" font-family="DM Sans,sans-serif">Pending→Progress→Done</text>
+
+        <!-- Relationship arrows -->
+        <!-- Branches → Employees -->
+        <line x1="100" y1="190" x2="100" y2="240" stroke="#5c6880" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+        <!-- Branches → Accounts (via label) -->
+        <path d="M 180 125 Q 340 80 430 200" fill="none" stroke="#5c6880" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+        <!-- Customers → Accounts -->
+        <line x1="390" y1="140" x2="430" y2="210" stroke="#f5a623" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arr)"/>
+        <!-- Customers → Service_Requests -->
+        <line x1="305" y1="220" x2="305" y2="280" stroke="#f5a623" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+        <!-- Accounts → Transactions -->
+        <line x1="615" y1="220" x2="660" y2="220" stroke="#8b5cf6" stroke-width="1.2" stroke-dasharray="5 3" marker-end="url(#arr)"/>
+        <!-- Employees → Transactions -->
+        <path d="M 180 310 Q 420 310 660 230" fill="none" stroke="#00c4a7" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+        <!-- Services → Service_Requests -->
+        <line x1="510" y1="400" x2="400" y2="380" stroke="#22c55e" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arr)"/>
+        <!-- Employees → Service_Requests -->
+        <path d="M 180 350 Q 200 380 220 360" fill="none" stroke="#00c4a7" stroke-width="0.8" stroke-dasharray="3 3" marker-end="url(#arr)"/>
+
+        <!-- Legend -->
+        <rect x="20" y="510" width="820" height="55" rx="6" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <text x="36" y="528" font-size="10" fill="#5c6880" font-family="DM Sans,sans-serif">LEGEND:</text>
+        <text x="90" y="528" font-size="10" fill="#9aa3b5" font-family="DM Mono,monospace">PK = Primary Key</text>
+        <text x="220" y="528" font-size="10" fill="#9aa3b5" font-family="DM Mono,monospace">FK = Foreign Key</text>
+        <text x="340" y="528" font-size="10" fill="#9aa3b5" font-family="DM Mono,monospace">✦ = UNIQUE</text>
+        <text x="430" y="528" font-size="10" fill="#9aa3b5" font-family="DM Mono,monospace">--- = relationship line</text>
+        <text x="600" y="528" font-size="10" fill="#5c6880" font-family="DM Mono,monospace">opt = optional FK</text>
+        <text x="36" y="548" font-size="10" fill="#4a8ff7" font-family="DM Sans,sans-serif">Solid borders = strong entities</text>
+        <text x="220" y="548" font-size="10" fill="#f5a623" font-family="DM Sans,sans-serif">Dashed = weak/junction</text>
+        <text x="380" y="548" font-size="10" fill="#00c4a7" font-family="DM Sans,sans-serif">All FKs enforce referential integrity</text>
+        <text x="630" y="548" font-size="10" fill="#22c55e" font-family="DM Sans,sans-serif">ON DELETE CASCADE where noted</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- SQL Schema Summary -->
+  <div class="section-grid-3" style="margin-top:16px;">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Design Assumptions</div></div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--text-2);">
+          <div>✓ Each customer → multiple accounts (Savings/Current)</div>
+          <div>✓ Every transaction → exactly 1 account, optionally 1 employee</div>
+          <div>✓ Balance Inquiry → NULL amount; financial txns must be positive</div>
+          <div>✓ Account status derived from opening date (pre-2024 → Inactive)</div>
+          <div>✓ Employee roles: Teller · Manager · Customer Service</div>
+          <div>✓ Service requests: Pending→In Progress→Completed/Rejected</div>
+          <div>✓ Soft-delete: 'Closed' preserves audit history</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Constraints Applied</div></div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;">
+          <div style="padding:8px;background:var(--card-2);border-radius:var(--radius-sm);font-family:var(--mono);color:var(--teal);">Balance CHECK (≥ 0)</div>
+          <div style="padding:8px;background:var(--card-2);border-radius:var(--radius-sm);font-family:var(--mono);color:var(--teal);">Account_Type IN ('Savings','Current')</div>
+          <div style="padding:8px;background:var(--card-2);border-radius:var(--radius-sm);font-family:var(--mono);color:var(--teal);">Status DEFAULT 'Active'</div>
+          <div style="padding:8px;background:var(--card-2);border-radius:var(--radius-sm);font-family:var(--mono);color:var(--amber);">National_ID, Email UNIQUE</div>
+          <div style="padding:8px;background:var(--card-2);border-radius:var(--radius-sm);font-family:var(--mono);color:var(--red);">Complex chk_amount_logic CHECK</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">SQL Queries Implemented</div></div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text-2);">
+          <div><span style="color:var(--blue-light);font-family:var(--mono);">Q1</span> Customer Master View (top 20 by balance)</div>
+          <div><span style="color:var(--blue-light);font-family:var(--mono);">Q2</span> Account Portfolio (inactive/closed)</div>
+          <div><span style="color:var(--blue-light);font-family:var(--mono);">Q3</span> Monthly Transaction Summary</div>
+          <div><span style="color:var(--blue-light);font-family:var(--mono);">Q4</span> Customer Statement View</div>
+          <div><span style="color:var(--blue-light);font-family:var(--mono);">Q5</span> Top 10 Customers by Activity</div>
+          <div><span style="color:var(--blue-light);font-family:var(--mono);">Q6</span> Branch Performance (30 days)</div>
+          <div><span style="color:var(--blue-light);font-family:var(--mono);">Q7</span> Employee Activity Report</div>
+          <div><span style="color:var(--blue-light);font-family:var(--mono);">Q8</span> Service Adoption View</div>
+          <div><span style="color:var(--blue-light);font-family:var(--mono);">Q9</span> Inactive Accounts (60+ days)</div>
+          <div><span style="color:var(--red);font-family:var(--mono);">Q10</span> Suspicious Transaction Detection</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /er page -->
+
+</main>
+</div><!-- /app -->
+
+<script>
+// ── Clock ──
+function tick() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('en-US', { hour12: false }) +
+    ' · ' + now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+tick(); setInterval(tick, 1000);
+
+// ── Nav ──
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── Monthly Bars ──
+const months = [
+  { label: 'Mar', credit: 298374, debit: 190500, count: 80 },
+  { label: 'Apr', credit: 2314107, debit: 2119300, count: 803 },
+  { label: 'May', credit: 3086910, debit: 2009944, count: 938 },
+  { label: 'Jun', credit: 2860304, debit: 2253454, count: 882 },
+  { label: 'Jul', credit: 2942479, debit: 2181127, count: 985 },
+  { label: 'Aug', credit: 3720875, debit: 2509015, count: 1079 },
+  { label: 'Sep', credit: 3420086, debit: 2623806, count: 1188 },
+  { label: 'Oct', credit: 3893520, debit: 2839765, count: 1292 },
+  { label: 'Nov', credit: 4471817, debit: 3352428, count: 1452 },
+  { label: 'Dec', credit: 5170958, debit: 4108716, count: 1701 },
+  { label: 'Jan', credit: 6611003, debit: 4760758, count: 2068 },
+  { label: 'Feb', credit: 6411912, debit: 5563894, count: 2211 },
+  { label: 'Mar26', credit: 5940139, debit: 4298653, count: 1827 },
+];
+
+const maxCredit = Math.max(...months.map(m => m.credit));
+const container = document.getElementById('monthly-bars');
+months.forEach(m => {
+  const creditH = Math.round((m.credit / maxCredit) * 130);
+  const debitH = Math.round((m.debit / maxCredit) * 130);
+  const div = document.createElement('div');
+  div.style.cssText = 'flex:1;display:flex;align-items:flex-end;gap:2px;height:130px;';
+  div.innerHTML = `
+    <div title="Credit: $${(m.credit/1e6).toFixed(2)}M" style="flex:1;height:${creditH}px;background:#1a6ef5;opacity:0.8;border-radius:3px 3px 0 0;cursor:pointer;transition:opacity 0.2s;" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.8"></div>
+    <div title="Debit: $${(m.debit/1e6).toFixed(2)}M" style="flex:1;height:${debitH}px;background:#f04843;opacity:0.6;border-radius:3px 3px 0 0;cursor:pointer;transition:opacity 0.2s;" onmouseenter="this.style.opacity=0.9" onmouseleave="this.style.opacity=0.6"></div>
+  `;
+  container.appendChild(div);
+});
+</script>
+</body>
+</html>
