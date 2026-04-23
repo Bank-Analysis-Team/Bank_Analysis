@@ -100,10 +100,22 @@ A detailed **Correlation Heatmap** is used to:
 
 ---
 
+## 👥 Team Members
+
+| Name | Responsibility | Role |
+| :--- | :--- | :--- |
+| **Hayam Medhat Wahdan** | Report Implementation + Bank System | **Team Leader** |
+| Hoda Mohamed Ezzat | Data Integration + Database Implementation | Member |
+| Nada Fahmy Fahmy | SQL Questions + ER Diagram | Member |
+| Esraa Mohamed Attia | EDA + Python Scripts | Member |
+| Esraa Shawky Mahmoud | EDA + Orange Data Mining | Member |
+```
+---
+
 ## 📬 Contact
 
 If you have any questions or suggestions, feel free to reach out or open an issue.
-
+hayamm.wahdan@gmail.com | https://www.linkedin.com/in/hayamwahdan/
 ---
 
 ✨ *This project demonstrates practical application of data analysis and machine learning in the banking domain.*
