@@ -128,6 +128,9 @@ If you have any questions or suggestions, feel free to reach out or open an issu
 📧 **Email:** [roaaezzawy@gmail.com](mailto:roaaezzawy@gmail.com)  
 🔗 **LinkedIn:** [Esraa Al-Azzawy](http://www.linkedin.com/in/esraa-mohamed-al-azzawy/)
 
+📧 **Email:** [nada.fahmy2244@gmail.com](mailto:nada.fahmy2244@gmail.com)  
+🔗 **LinkedIn:** [Nada Fahmy](http://www.linkedin.com/in/nada-fahmy-)
+
 ---
 
 ✨ *This project demonstrates practical application of data analysis and machine learning in the banking domain.*
