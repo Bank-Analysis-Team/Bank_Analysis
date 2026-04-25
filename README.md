@@ -122,6 +122,9 @@ If you have any questions or suggestions, feel free to reach out or open an issu
 📧 **Email:** [hayamm.wahdan@gmail.com](mailto:hayamm.wahdan@gmail.com)  
 🔗 **LinkedIn:** [Hayam Wahdan](https://www.linkedin.com/in/hayamwahdan/)
 
+📧 **Email:** [huda.elhamahmy@gmail.com](mailto:huda.elhamahmy@gmail.com)  
+🔗 **LinkedIn:** [Hoda Elhamahmy](https://www.linkedin.com/in/hoda-elhamahmy1/)
+
 ---
 
 ✨ *This project demonstrates practical application of data analysis and machine learning in the banking domain.*
