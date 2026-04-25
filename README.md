@@ -2,6 +2,9 @@
 
 # 🏦 Bank Service & Transaction Analysis
 
+## 🎓 Project Context
+This project was developed as a final course project for the **Database and Data Mining** course during the **"Digital Pioneers Initiative - مبادرة الرواد الرقميون"**, under the supervision of **Dr. Mohamed Sobhy**.
+
 ## Project Presentation
 https://bank-ai-show.lovable.app/
 
