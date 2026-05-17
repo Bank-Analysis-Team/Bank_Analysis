@@ -119,19 +119,14 @@ A detailed **Correlation Heatmap** is used to:
 
 If you have any questions or suggestions, feel free to reach out or open an issue.
 
-📧 **Email:** [hayamm.wahdan@gmail.com](mailto:hayamm.wahdan@gmail.com)  
 🔗 **LinkedIn:** [Hayam Wahdan](https://www.linkedin.com/in/hayamwahdan/)
-
-📧 **Email:** [huda.elhamahmy@gmail.com](mailto:huda.elhamahmy@gmail.com)  
+ 
 🔗 **LinkedIn:** [Hoda Elhamahmy](https://www.linkedin.com/in/hoda-elhamahmy1/)
 
-📧 **Email:** [roaaezzawy@gmail.com](mailto:roaaezzawy@gmail.com)  
 🔗 **LinkedIn:** [Esraa Al-Azzawy](http://www.linkedin.com/in/esraa-mohamed-al-azzawy/)
 
-📧 **Email:** [nada.fahmy2244@gmail.com](mailto:nada.fahmy2244@gmail.com)  
 🔗 **LinkedIn:** [Nada Fahmy](http://www.linkedin.com/in/nada-fahmy-)
 
-📧 **Email:** [esraashawky09@gmail.com](mailto:esraashawky09@gmail.com)  
 🔗 **LinkedIn:** [Esraa Mahmoud](http://www.linkedin.com/in/esraa-mahmoud22/)
 
 ---
